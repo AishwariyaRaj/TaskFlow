@@ -70,10 +70,14 @@ export default function AIChatbot() {
       if (data.summary) {
         aiResponse.text = data.summary;
       } else if (data.tasks) {
-        aiResponse.text = `Found/Created ${data.tasks.length} tasks matching your request.`;
-        aiResponse.data = data.tasks;
+        if (data.tasks.length > 0) {
+          aiResponse.text = `I've successfully ${userMsg.toLowerCase().includes('create') ? 'created' : 'found'} ${data.tasks.length} tasks for you.`;
+          aiResponse.data = data.tasks;
+        } else {
+          aiResponse.text = "I couldn't find or create any tasks based on that request. Try being more specific!";
+        }
       } else {
-        aiResponse.text = "I've processed your request.";
+        aiResponse.text = "I've processed your request, but I'm not sure what the result was. Please try again with different wording.";
       }
 
       dispatch(addMessage(aiResponse));
