@@ -102,6 +102,9 @@ app.post('/api/webhooks/stripe', rawBodyMiddleware, async (req, res) => {
 // Health check
 app.get('/api/health', (req, res) => res.json({ ok: true, timestamp: new Date().toISOString() }));
 
+// Root route
+app.get('/', (req, res) => res.send('🚀 Task Manager API is running...'));
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err);
