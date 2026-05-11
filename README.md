@@ -2,8 +2,6 @@
 
 TaskFlow is a high-performance, multi-tenant SaaS task management platform built with the MERN stack. It features real-time collaboration, advanced project management, automated workflows, and a robust billing system powered by Stripe.
 
-![TaskFlow Header](https://via.placeholder.com/1200x400/1a1a1a/ffffff?text=TaskFlow+MERN+SaaS+Platform)
-
 ## 🚀 Key Features
 
 - **Multi-Tenant Architecture**: Manage multiple workspaces with isolated data and custom settings.
@@ -87,4 +85,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-Built with ❤️ by [Aishwariya Raj](https://github.com/AishwariyaRaj)
+Built by [Aishwariya Raj](https://github.com/AishwariyaRaj)
