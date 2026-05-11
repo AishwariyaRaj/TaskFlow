@@ -44,8 +44,7 @@ export default function LandingPage() {
         </div>
         
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter mb-8 leading-[0.95]">
-          Built for teams <br/>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-500">that move fast.</span>
+          Built for teams that move fast.
         </h1>
         
         <p className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed font-medium">
