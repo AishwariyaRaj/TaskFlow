@@ -17,16 +17,17 @@ const generateTasks = async (prompt) => {
     - status ("Todo")
     - suggestedDeadline (ISO date string, assume today is ${new Date().toISOString()})
     
-    Do not include any markdown formatting or extra text.
+    Do not include any markdown formatting, code blocks, or extra text.
+    Ensure the JSON is valid and can be parsed.
   `;
 
   try {
     const result = await model.generateContent(fullPrompt);
     const response = await result.response;
-    const text = response.text();
+    const text = response.text().trim();
     
-    // Clean potential markdown from response
-    const jsonMatch = text.match(/\[.*\]/s);
+    // Improved JSON extraction: handles both raw text and ```json blocks
+    const jsonMatch = text.match(/\[[\s\S]*\]/); 
     if (!jsonMatch) {
       console.log('No JSON array found in AI response:', text);
       return [];
@@ -78,14 +79,14 @@ const convertNLToQuery = async (query) => {
     - status (enum: "To Do", "In Progress", "Completed")
     
     Example: "High priority bugs" -> {"priority": "High", "title": {"$regex": "bug", "$options": "i"}}
-    Return ONLY the raw JSON object. No markdown.
+    Return ONLY the raw JSON object. No markdown, no code blocks. Ensure correct MongoDB query syntax.
   `;
 
   try {
     const result = await model.generateContent(fullPrompt);
     const response = await result.response;
-    const text = response.text();
-    const jsonMatch = text.match(/\{.*\}/s);
+    const text = response.text().trim();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.log('No JSON object found in AI response:', text);
       return {};

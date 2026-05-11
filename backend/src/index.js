@@ -169,10 +169,20 @@ async function start() {
   });
 
   const port = process.env.PORT || 4000;
-  server.listen(port, () => console.log(`🚀 Server listening on port ${port}`));
+  if (process.env.NODE_ENV !== 'production') {
+    server.listen(port, () => console.log(`🚀 Server listening on port ${port}`));
+  }
+}
+
+// Connect DB outside start() for Vercel cold starts
+if (process.env.NODE_ENV === 'production') {
+  connectDB(process.env.MONGO_URI);
 }
 
 start().catch(err => {
   console.error('Failed to start server:', err);
-  process.exit(1);
+  if (process.env.NODE_ENV !== 'production') process.exit(1);
 });
+
+module.exports = server;
+
