@@ -9,6 +9,7 @@ import { connectSocket, getSocket, joinWorkspace } from '../../services/socket'
 import Sidebar from './Sidebar'
 import TopNav from './TopNav'
 import ToastContainer from '../ui/Toast'
+import AIChatbot from '../ui/AIChatbot'
 
 export default function AppLayout({ children, title }) {
   const token = useSelector(s => s.auth.accessToken)
@@ -74,6 +75,7 @@ export default function AppLayout({ children, title }) {
           {children}
         </div>
       </main>
+      <AIChatbot />
       <ToastContainer />
     </div>
   )

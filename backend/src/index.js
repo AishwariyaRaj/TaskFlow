@@ -42,6 +42,7 @@ app.use('/api', limiter);
 
 // Auth routes
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/ai', require('./routes/ai'));
 
 // Simple test endpoint
 app.get('/api/test', (req, res) => {
