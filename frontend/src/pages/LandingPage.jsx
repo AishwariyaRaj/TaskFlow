@@ -43,20 +43,23 @@ export default function LandingPage() {
           Revolutionizing team production
         </div>
         
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter mb-8 leading-[0.95]">
-          Built for teams that move fast.
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter mb-8 leading-[0.95]">
+          Built for teams <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-500">that move fast.</span>
         </h1>
         
-        <p className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed font-medium">
+        <p className="text-base md:text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
           TaskFlow is a comprehensive project management suite designed to eliminate fragmented workflows. We combine task tracking, automation, and real-time collaboration into one lightning-fast interface.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mx-auto mb-16">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-lg mx-auto mb-16">
           <Link to="/register" className="w-full sm:w-auto px-8 py-4 bg-white text-slate-950 font-bold rounded-xl hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
             Build your workspace
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
           </Link>
-          <Link to="/login" className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white font-bold rounded-xl border border-slate-800 hover:border-slate-700 transition-all">
+          <button className="w-full sm:w-auto px-8 py-4 bg-indigo-600/10 text-indigo-400 font-bold rounded-xl border border-indigo-500/20 hover:bg-indigo-500/20 transition-all">
+            Join Waitlist
+          </button>
+          <Link to="/login" className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white font-bold rounded-xl border border-slate-800 hover:border-slate-700 transition-all font-medium">
             View Live Demo
           </Link>
         </div>
