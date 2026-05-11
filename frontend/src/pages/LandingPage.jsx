@@ -51,14 +51,11 @@ export default function LandingPage() {
           TaskFlow is a comprehensive project management suite designed to eliminate fragmented workflows. We combine task tracking, automation, and real-time collaboration into one lightning-fast interface.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-lg mx-auto mb-16">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mx-auto mb-16">
           <Link to="/register" className="w-full sm:w-auto px-8 py-4 bg-white text-slate-950 font-bold rounded-xl hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
             Build your workspace
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
           </Link>
-          <button className="w-full sm:w-auto px-8 py-4 bg-indigo-600/10 text-indigo-400 font-bold rounded-xl border border-indigo-500/20 hover:bg-indigo-500/20 transition-all">
-            Join Waitlist
-          </button>
           <Link to="/login" className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white font-bold rounded-xl border border-slate-800 hover:border-slate-700 transition-all font-medium">
             View Live Demo
           </Link>
@@ -156,17 +153,50 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="relative z-10 py-32 px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+      <section id="pricing" className="relative z-10 py-32 px-6">
+        <div className="max-w-7xl mx-auto mb-20 text-center">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6">Simple, transparent pricing.</h2>
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Choose the plan that fits your team's size and stage. No hidden fees.
+          </p>
+        </div>
+        
+        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
           {[
-            { label: "Tasks Completed", value: "2M+" },
-            { label: "Active Teams", value: "500+" },
-            { label: "Uptime", value: "99.9%" },
-            { label: "User Rating", value: "4.9/5" }
-          ].map((stat, i) => (
-            <div key={i}>
-              <div className="text-4xl md:text-5xl font-black text-white mb-2">{stat.value}</div>
-              <div className="text-sm font-bold text-slate-500 uppercase tracking-widest">{stat.label}</div>
+            {
+              name: "Pro",
+              price: "$19",
+              desc: "Perfect for growing teams",
+              features: ["Unlimited projects", "Task automation", "Kanban boards", "Basic analytics"]
+            },
+            {
+              name: "Team",
+              price: "$49",
+              desc: "Best for whole organizations",
+              features: ["Everything in Pro", "Advanced RBAC", "Priority support", "Full history"]
+            },
+            {
+              name: "Custom",
+              price: "Contact",
+              desc: "Tailored for large enterprises",
+              features: ["Enterprise security", "Dedicated manager", "Custom domain", "SLA support"]
+            }
+          ].map((plan, i) => (
+            <div key={i} className="p-8 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-indigo-500/50 transition-all flex flex-col">
+              <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+              <div className="text-4xl font-black text-white mb-4">{plan.price}<span className="text-sm font-medium text-slate-500">/mo</span></div>
+              <p className="text-slate-400 text-sm mb-8">{plan.desc}</p>
+              <ul className="flex flex-col gap-3 mb-10 mt-auto">
+                {plan.features.map((f, j) => (
+                  <li key={j} className="text-sm text-slate-500 flex items-center gap-2">
+                    <svg className="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link to="/register" className={`w-full py-3 rounded-lg font-bold text-sm text-center transition-all ${i === 1 ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}>
+                Get Started
+              </Link>
             </div>
           ))}
         </div>
