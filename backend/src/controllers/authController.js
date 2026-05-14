@@ -48,13 +48,28 @@ async function resendVerification(req, res){
 
 async function login(req, res){
   const { email, password } = req.body;
+  console.log(`[AUTH] Login attempt for: ${email}`);
   if (!email || !password) return res.status(400).json({ message: 'Email and password required' });
-  const user = await User.findOne({ email: email.toLowerCase() });
-  if (!user) return res.status(400).json({ message: 'Invalid credentials' });
-  const ok = await bcrypt.compare(password, user.passwordHash);
-  if (!ok) return res.status(400).json({ message: 'Invalid credentials' });
-  if (!user.isEmailVerified) return res.status(403).json({ message: 'Please verify your email before logging in' });
-  const accessToken = jwtUtils.signAccess({ sub: user._id }, process.env.JWT_ACCESS_SECRET);
+  
+  try {
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      console.log(`[AUTH] User not found: ${email}`);
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+    
+    const ok = await bcrypt.compare(password, user.passwordHash);
+    if (!ok) {
+      console.log(`[AUTH] Password mismatch for: ${email}`);
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+    
+    if (!user.isEmailVerified) {
+      console.log(`[AUTH] Email not verified: ${email}`);
+      return res.status(403).json({ message: 'Please verify your email before logging in' });
+    }
+
+    const accessToken = jwtUtils.signAccess({ sub: user._id }, process.env.JWT_ACCESS_SECRET);
   const refreshToken = jwtUtils.signRefresh({ sub: user._id }, process.env.JWT_REFRESH_SECRET);
   user.refreshTokens.push({ token: refreshToken, createdAt: new Date() });
   // Keep only last 5 refresh tokens
@@ -62,10 +77,15 @@ async function login(req, res){
     user.refreshTokens = user.refreshTokens.slice(-5);
   }
   await user.save();
-  const cookieOpts = { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 30*24*60*60*1000 };
-  if (process.env.NODE_ENV === 'production') cookieOpts.secure = true;
-  res.cookie('refreshToken', refreshToken, cookieOpts);
-  res.json({ accessToken, user: { _id: user._id, name: user.name, email: user.email } });
+    const cookieOpts = { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 30*24*60*60*1000 };
+    if (process.env.NODE_ENV === 'production') cookieOpts.secure = true;
+    res.cookie('refreshToken', refreshToken, cookieOpts);
+    console.log(`[AUTH] Login successful: ${email}`);
+    res.json({ accessToken, user: { _id: user._id, name: user.name, email: user.email } });
+  } catch (err) {
+    console.error('[AUTH] Login error:', err);
+    res.status(500).json({ message: 'Internal server error during login' });
+  }
 }
 
 async function googleLogin(req, res) {

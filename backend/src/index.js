@@ -18,14 +18,15 @@ if (process.env.STRIPE_SECRET && process.env.STRIPE_SECRET.startsWith('sk_live_'
 // Security
 app.use(helmet({
   crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false // Disable CSP for easier debugging in local/dev
 }));
 
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',').map(s => s.trim());
+const allowedOrigins = (process.env.FRONTEND_URL || '').split(',').map(s => s.trim().replace(/\/$/, ""));
 app.use(cors({
   origin: (origin, cb) => {
     // Check if origin is allowed or if it's a sub-domain of a vercel app
-    if (!origin || allowedOrigins.some(o => origin.startsWith(o)) || origin.endsWith('.vercel.app')) return cb(null, true);
+    if (!origin || allowedOrigins.includes(origin) || origin.includes('localhost') || origin.endsWith('.vercel.app')) return cb(null, true);
     cb(new Error('Not allowed by CORS'));
   },
   credentials: true
@@ -121,7 +122,7 @@ async function start() {
   const io = new Server(server, {
     cors: {
       origin: (origin, cb) => {
-        if (!origin || allowedOrigins.some(o => origin.startsWith(o))) return cb(null, true);
+        if (!origin || allowedOrigins.includes(origin) || origin.includes('localhost') || origin.endsWith('.vercel.app')) return cb(null, true);
         cb(new Error('Not allowed by CORS'));
       },
       credentials: true
