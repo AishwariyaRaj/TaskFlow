@@ -60,7 +60,7 @@ async function login(req, res){
     
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) {
-      console.log(`[AUTH] Password mismatch for: ${email}`);
+      console.log(`[AUTH] Password mismatch for: ${email}. Provided: ${password}, Hash in DB: ${user.passwordHash}`);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
     
