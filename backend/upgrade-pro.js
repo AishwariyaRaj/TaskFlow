@@ -5,7 +5,12 @@ const Workspace = require('./src/models/Workspace');
 const Subscription = require('./src/models/Subscription');
 
 const MONGO_URI = process.env.MONGO_URI;
-const WORKSPACE_ID = '69fe08f22807ef44cca586bd';
+const WORKSPACE_ID = process.argv[2] || process.env.WORKSPACE_ID;
+if (!WORKSPACE_ID) {
+  console.error('Error: Please provide a workspace ID as a CLI argument or set WORKSPACE_ID env var.');
+  console.error('Usage: node upgrade-pro.js <workspaceId>');
+  process.exit(1);
+}
 
 async function upgradeWorkspace() {
   try {

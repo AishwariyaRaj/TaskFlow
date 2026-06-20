@@ -3,7 +3,12 @@ require('dotenv').config();
 const Workspace = require('./src/models/Workspace');
 const Subscription = require('./src/models/Subscription');
 
-const WORKSPACE_ID = '6a00954f80392dc31ad8281e';
+const WORKSPACE_ID = process.argv[2] || process.env.WORKSPACE_ID;
+if (!WORKSPACE_ID) {
+  console.error('Error: Please provide a workspace ID as a CLI argument or set WORKSPACE_ID env var.');
+  console.error('Usage: node force-team.js <workspaceId>');
+  process.exit(1);
+}
 
 async function forceTeam() {
   try {
