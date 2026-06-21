@@ -16,11 +16,10 @@ async function register(req, res){
   const isEmailVerified = !process.env.SMTP_HOST;
   const emailVerificationToken = isEmailVerified ? undefined : uuidv4();
   const user = await User.create({ name, email: email.toLowerCase(), passwordHash, emailVerificationToken, isEmailVerified });
-  try{
-    await sendVerificationEmail(user, emailVerificationToken);
-  } catch(err){
+  // Send email in background so registration responds immediately and doesn't hang
+  sendVerificationEmail(user, emailVerificationToken).catch(err => {
     console.error('sendVerificationEmail error', err);
-  }
+  });
   res.status(201).json({ message: 'User created. Please check your email to verify your account.' });
 }
 
@@ -104,10 +103,18 @@ async function googleLogin(req, res) {
       const payload = ticket.getPayload();
       name = payload.name; email = payload.email; googleId = payload.sub; picture = payload.picture;
     } else {
-      // Access token flow (useGoogleLogin hook)
-      const resp = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`);
-      if (!resp.ok) return res.status(400).json({ message: 'Invalid Google access token' });
-      const info = await resp.json();
+      // Access token flow (useGoogleLogin hook) using native https module
+      const https = require('https');
+      const info = await new Promise((resolve, reject) => {
+        https.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            if (res.statusCode >= 400) reject(new Error('Failed to get userinfo: ' + data));
+            else resolve(JSON.parse(data));
+          });
+        }).on('error', reject);
+      });
       name = info.name; email = info.email; googleId = info.sub; picture = info.picture;
     }
 
