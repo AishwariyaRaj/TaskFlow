@@ -177,9 +177,7 @@ async function start() {
   });
 
   const port = process.env.PORT || 4000;
-  if (process.env.NODE_ENV !== 'production') {
-    server.listen(port, () => console.log(`🚀 Server listening on port ${port}`));
-  }
+  server.listen(port, '0.0.0.0', () => console.log(`🚀 Server listening on port ${port}`));
 }
 
 // Connect DB outside start() for Vercel cold starts
