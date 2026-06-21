@@ -1,334 +1,422 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
-import { 
-  Zap, Bot, Lock, BarChart3, Users, Cloud, 
-  ChevronRight, Play, CheckCircle2, MessageSquare, 
-  Calendar, LayoutPanelLeft, Workflow, Bell, 
-  ArrowRight, Share2, Menu, X, Sparkles, Activity, Layers, Globe, CreditCard
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Zap, Bot, Lock, BarChart3, Users, Shield,
+  ArrowRight, CheckCircle2, Play, Sparkles,
+  Activity, Workflow, CreditCard, GitBranch,
+  Menu, X, Star, ChevronRight, Globe, Cpu,
+  LayoutDashboard, Calendar, Bell, TrendingUp,
 } from "lucide-react";
 import "../styles/landing.css";
 
-const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+const up = (d = 0) => ({
+  initial: { opacity: 0, y: 28 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.6, delay: d, ease: [0.22, 1, 0.36, 1] },
+});
 
+/* ── Navbar ── */
+function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const h = () => setScrolled(window.scrollY > 30);
+    window.addEventListener("scroll", h);
+    return () => window.removeEventListener("scroll", h);
   }, []);
-
   return (
-    <nav className={isScrolled ? "fixed top-0 w-full z-[100] transition-all duration-300 py-4 glass border-b" : "fixed top-0 w-full z-[100] transition-all duration-300 py-6 bg-transparent"}>
-      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-xl shadow-lg shadow-indigo-600/20 group-hover:scale-110 transition-transform">
-            T
-          </div>
-          <span className="text-2xl font-black font-jakarta tracking-tight text-white">TaskFlow</span>
+    <nav className={`nav ${scrolled ? "nav-solid" : ""}`}>
+      <div className="nav-inner">
+        <Link to="/" className="logo">
+          <div className="logo-icon"><Zap size={18} /></div>
+          <span className="logo-text">TaskFlow</span>
         </Link>
-        
-        <div className="hidden lg:flex items-center gap-8 text-sm text-gray-400 font-medium font-jakarta uppercase tracking-wider">
-          <a href="#features" className="hover:text-white transition-colors">Features</a>
-          <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
-          <a href="#workflow" className="hover:text-white transition-colors">Workflow</a>
-          <a href="#integrations" className="hover:text-white transition-colors">Integrations</a>
+        <div className="nav-links">
+          {["features","workflow","pricing"].map(l => (
+            <a key={l} href={`#${l}`} className="nav-a">{l.charAt(0).toUpperCase()+l.slice(1)}</a>
+          ))}
         </div>
-
-        <div className="hidden lg:flex items-center gap-4">
-          <Link to="/login" className="px-6 py-2 text-sm font-bold text-gray-300 hover:text-white transition-colors">Login</Link>
-          <Link to="/register" className="bg-white text-black hover:bg-indigo-50 px-6 py-2.5 rounded-xl text-sm font-black shadow-lg shadow-white/5 transition-all">GET STARTED</Link>
+        <div className="nav-ctas">
+          <Link to="/login" className="btn-ghost">Sign in</Link>
+          <Link to="/register" className="btn-primary btn-sm">Get Started <ChevronRight size={13}/></Link>
         </div>
-
-        <button className="lg:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          {mobileMenuOpen ? <X /> : <Menu />}
+        <button className="hamburger" onClick={() => setOpen(!open)}>
+          {open ? <X size={22}/> : <Menu size={22}/>}
         </button>
       </div>
-
       <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute top-full left-0 w-full glass border-b p-6 flex flex-col gap-6 lg:hidden bg-black/95">
-            <a href="#features" className="text-lg font-medium text-white" onClick={() => setMobileMenuOpen(false)}>Features</a>
-            <a href="#pricing" className="text-lg font-medium text-white" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
-            <Link to="/login" className="text-center font-bold text-lg text-white">Login</Link>
-            <Link to="/register" className="bg-indigo-600 py-4 rounded-xl text-center font-bold text-lg text-white">Get Started</Link>
+        {open && (
+          <motion.div initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}} className="mobile-menu">
+            {["features","workflow","pricing"].map(l => (
+              <a key={l} href={`#${l}`} className="mobile-a" onClick={() => setOpen(false)}>{l.charAt(0).toUpperCase()+l.slice(1)}</a>
+            ))}
+            <Link to="/login" className="btn-ghost" onClick={() => setOpen(false)}>Sign in</Link>
+            <Link to="/register" className="btn-primary" onClick={() => setOpen(false)} style={{textAlign:"center",padding:".85rem"}}>Get Started</Link>
           </motion.div>
         )}
       </AnimatePresence>
     </nav>
   );
-};
+}
 
-const FeatureCard = ({ icon: Icon, title, desc, delay, color, image, highlight }) => (
-  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay }} viewport={{ once: true }} whileHover={{ y: -10 }} className="glass p-10 rounded-[40px] group relative overflow-hidden flex flex-col h-full border border-white/5">
-    <div className={"w-16 h-16 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform " + (color === "indigo" ? "bg-indigo-500/10 text-indigo-500" : (color === "purple" ? "bg-purple-500/10 text-purple-500" : "bg-cyan-500/10 text-cyan-500"))}>
-      <Icon size={28} />
-    </div>
-    <h3 className="text-3xl font-black mb-4 font-jakarta text-white tracking-tighter italic">{title}</h3>
-    <p className="text-gray-400 font-medium leading-relaxed mb-10 flex-grow">{desc}</p>
-    
-    {image && (
-        <div className="relative rounded-2xl overflow-hidden h-40 border border-white/5 bg-black/40">
-          <img src={image} alt={title} className="w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-opacity" />
-        </div>
-      )}
-      
-      {highlight && (
-        <div className="bg-indigo-900/20 p-4 rounded-xl border border-indigo-500/20 font-mono text-[11px] text-indigo-400">
-          {highlight}
-        </div>
-      )}
-  </motion.div>
-);
-
-const Step = ({ num, title, text }) => (
-  <div className="flex gap-8 group">
-    <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center font-black text-lg z-10 group-hover:scale-110 transition-transform">
-      {num}
-    </div>
-    <div className="group-hover:translate-x-2 transition-transform">
-      <h4 className="text-2xl font-black mb-2 tracking-tighter italic text-white">{title}</h4>
-      <p className="text-gray-500 font-medium tracking-wide">{text}</p>
-    </div>
-  </div>
-);
-
-const PricingCard = ({ plan, price, features, recommended, delay }) => (
-  <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay }} viewport={{ once: true }} className={recommended ? "p-12 rounded-[40px] flex flex-col glass border-2 border-indigo-500 shadow-2xl shadow-indigo-500/10 relative scale-105 z-10" : "p-12 rounded-[40px] flex flex-col glass border border-white/5"}>
-    {recommended && <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-indigo-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white">Recommended</div>}
-    <h4 className="text-gray-500 font-black uppercase tracking-widest text-xs mb-2">{plan}</h4>
-    <div className="flex items-baseline gap-1 mb-10">
-      <span className="text-6xl font-black font-jakarta text-white tracking-tighter">{price === "0" ? "Free" : `$${price}`}</span>
-      {price !== "0" && <span className="text-gray-500 text-sm font-bold">/mo</span>}
-    </div>
-    <div className="space-y-5 mb-12 flex-grow">
-      {features.map((f, i) => (
-        <div key={i} className="flex items-center gap-3 text-xs font-bold text-gray-400">
-          <CheckCircle2 size={16} className="text-indigo-500" />
-          {f}
-        </div>
-      ))}
-    </div>
-    <Link to="/register" className={recommended ? "w-full py-5 rounded-2xl font-black text-center bg-indigo-600 hover:bg-indigo-500 transition-all font-jakarta uppercase tracking-widest text-xs text-white" : "w-full py-5 rounded-2xl font-black text-center glass hover:bg-white/5 transition-all font-jakarta uppercase tracking-widest text-xs text-white"}>{price === "0" ? "GET STARTED" : "UPGRADE NOW"}</Link>
-  </motion.div>
-);
-
-export default function LandingPage() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
+/* ── Hero ── */
+function Hero() {
   return (
-    <div className="bg-[#030303] text-white min-h-screen selection:bg-indigo-500/30 font-sans overflow-x-hidden">
-      <Navbar />
-      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 z-[110] origin-left" style={{ scaleX }} />
+    <section className="hero">
+      <div className="hero-orb hero-orb1" />
+      <div className="hero-orb hero-orb2" />
+      <div className="hero-orb hero-orb3" />
+      <div className="hero-grid" />
+      <div className="hero-inner">
+        <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:.6}} className="hero-badge">
+          <Sparkles size={13}/>
+          <span>AI-Powered Workspace · v2.0</span>
+          <span className="badge-live"><span className="live-dot"/>Live</span>
+        </motion.div>
+        <motion.h1 initial={{opacity:0,y:24}} animate={{opacity:1,y:0}} transition={{duration:.7,delay:.1}} className="hero-title">
+          Manage Projects.<br/>
+          <span className="grad-text">Ship Faster.</span>
+        </motion.h1>
+        <motion.p initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:.7,delay:.2}} className="hero-sub">
+          TaskFlow is the all-in-one SaaS platform that brings Kanban boards, real-time collaboration, 
+          AI automation, and Stripe billing into a single blazing-fast workspace.
+        </motion.p>
+        <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:.7,delay:.3}} className="hero-ctas">
+          <Link to="/register" className="btn-primary btn-lg btn-glow" id="hero-start">
+            Start for free <ArrowRight size={17} className="arrow"/>
+          </Link>
+          <button className="btn-outline btn-lg" id="hero-demo">
+            <Play size={15} fill="currentColor"/> Watch demo
+          </button>
+        </motion.div>
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:.5}} className="hero-trust">
+          {["No credit card","14-day Pro trial","Cancel anytime","SOC 2 Compliant"].map(t=>(
+            <span key={t} className="trust-pill"><CheckCircle2 size={13}/>{t}</span>
+          ))}
+        </motion.div>
 
-      {/* Hero Section */}
-      <section className="relative pt-64 pb-32 px-6 overflow-hidden min-h-screen flex items-center">
-        {/* Ambient background orbs */}
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-indigo-600/10 blur-[120px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-purple-600/10 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
-
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mb-10">
-            <Sparkles size={14} /> AI-Powered Workspace v2.0
-          </motion.div>
-          
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-6xl md:text-[120px] font-black font-jakarta leading-[0.9] tracking-tighter mb-10 text-white">
-            MANAGE PROJECTS <br />
-            <span className="text-gradient">AUTOMATE FLOW </span>
-          </motion.h1>
-          
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="max-w-3xl mx-auto text-gray-400 text-lg md:text-2xl mb-14 font-medium leading-relaxed">
-            The modern SaaS platform for high-performance teams. 
-            Organize work, automate chores, and ship faster with Neural intelligence.
-          </motion.p>
-          
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24">
-            <Link to="/register" className="group bg-indigo-600 hover:bg-indigo-500 px-10 py-5 rounded-2xl font-black text-sm tracking-widest flex items-center gap-3 transition-all shadow-2xl shadow-indigo-600/30 text-white">
-              START FREE TRIAL <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <button className="glass px-10 py-5 rounded-2xl font-black text-sm tracking-widest flex items-center gap-3 hover:bg-white/5 transition-all text-white border border-white/10 uppercase">
-              WATCH DEMO <Play size={18} fill="white" />
-            </button>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-             {[
-               { icon: Zap, label: "Real-Time" },
-               { icon: Bot, label: "Neural AI" },
-               { icon: Lock, label: "AES-256" },
-               { icon: CreditCard, label: "Stripe" },
-               { icon: Cloud, label: "Cloud Sync" },
-               { icon: BarChart3, label: "Insights" }
-             ].map((f, i) => (
-               <div key={i} className="glass p-4 rounded-2xl flex flex-col items-center gap-3 border border-white/5 group hover:border-indigo-500/30 transition-all">
-                 <f.icon className="w-5 h-5 text-gray-500 group-hover:text-indigo-400 transition-colors" />
-                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 group-hover:text-white transition-colors">{f.label}</span>
-               </div>
-             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Social Proof */}
-      <section className="py-24 border-y border-white/5 bg-white/[0.01] relative z-10">
-        <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center text-[10px] font-black text-gray-600 uppercase tracking-[0.5em] mb-12">Building the future with</p>
-          <div className="flex flex-wrap justify-center items-center gap-16 md:gap-24 opacity-30 grayscale contrast-125">
-             <div className="text-2xl font-black italic tracking-tighter">REACT</div>
-             <div className="text-2xl font-black italic tracking-tighter">NODE.JS</div>
-             <div className="text-2xl font-black italic tracking-tighter">TAILWIND</div>
-             <div className="text-2xl font-black italic tracking-tighter">STRIPE</div>
-             <div className="text-2xl font-black italic tracking-tighter">MONGODB</div>
+        {/* Dashboard mockup */}
+        <motion.div initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{duration:.9,delay:.4}} className="mockup-wrap">
+          <div className="mockup-topbar">
+            <span className="dot red"/><span className="dot yellow"/><span className="dot green"/>
+            <span className="mockup-url">app.taskflow.io/workspace/sprint-4</span>
           </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section id="features" className="py-40 px-6 relative z-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-32 text-center">
-            <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-8 italic text-white uppercase">Engineered for <br/><span className="text-gradient">Peak Performance.</span></h2>
-            <p className="text-gray-500 text-xl font-medium max-w-2xl mx-auto">Ditch the legacy tools. TaskFlow is built with modern tech for modern speed.</p>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-8">
-            <FeatureCard 
-              icon={Activity} 
-              title="Real-Time Sync" 
-              color="indigo" 
-              delay={0.1} 
-              desc="Collaborate instantly with 0ms latency. Updates push to all devices in milliseconds." 
-              image="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
-            />
-            <FeatureCard 
-              icon={Layers} 
-              title="Neural AI Assistant" 
-              color="purple" 
-              delay={0.2} 
-              desc="Automate task creation, summarize meetings, and predict bottlenecks before they happen." 
-              image="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80"
-              highlight='"Predict Sprint 4 Velocity"'
-            />
-            <FeatureCard 
-              icon={Globe} 
-              title="Global Scale" 
-              color="cyan" 
-              delay={0.3} 
-              desc="Deploy workspaces across regions. Enterprise-grade security out of the box." 
-              image="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=400&q=80"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Workflow Section */}
-      <section id="workflow" className="py-40 px-6 bg-black relative z-10 overflow-hidden">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-20 items-center">
-          <div className="flex-1">
-            <h2 className="text-5xl font-black tracking-tighter mb-12 italic text-white">SET UP IN <br/>SECONDS.</h2>
-            <div className="space-y-12 relative">
-              <div className="absolute left-[23px] top-6 bottom-6 w-0.5 bg-gradient-to-bottom from-indigo-500 to-transparent" />
-              <Step num="1" title="Create Workspace" text="Launch your command center in one click." />
-              <Step num="2" title="Invite The Crew" text="Sync your team across time zones instantly." />
-              <Step num="3" title="Ship Faster" text="Let the AI handle the chores while you code." />
+          <div className="mockup-body">
+            {/* Sidebar */}
+            <div className="mock-sidebar">
+              <div className="mock-brand"><Zap size={14}/></div>
+              {[LayoutDashboard, GitBranch, BarChart3, Calendar, Bell, Users].map((Icon,i)=>(
+                <div key={i} className={`mock-icon ${i===0?"mock-icon-active":""}`}><Icon size={14}/></div>
+              ))}
             </div>
-          </div>
-          <div className="flex-1 glass rounded-[40px] p-2 aspect-video relative overflow-hidden group shadow-2xl shadow-indigo-500/10">
-             <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-             <div className="bg-[#0a0a0a] w-full h-full rounded-[32px] p-6 flex items-center justify-center">
-                <Play size={80} className="text-indigo-500/20 group-hover:text-indigo-500 transition-all duration-500 group-hover:scale-110" />
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-40 px-6 relative z-10">
-        <div className="max-w-7xl mx-auto">
-           <div className="text-center mb-24">
-             <h2 className="text-4xl md:text-6xl font-black font-jakarta mb-6 text-white uppercase italic">Flexible Pricing</h2>
-             <p className="text-gray-500 text-lg">Scalable plans for every stage of growth.</p>
-           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <PricingCard plan="Free" price="0" features={["5 Projects", "Basic Flow", "Discord Support"]} delay={0.1} />
-            <PricingCard plan="Pro" price="19" recommended={true} features={["Unlimited Projects", "AI Assistant", "Deep Analytics", "Priority Support"]} delay={0.2} />
-            <PricingCard plan="Team" price="49" features={["Everything in Pro", "Audit Logs", "API Access", "SSO Security"]} delay={0.3} />
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-64 px-6 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div whileInView={{ scale: [0.95, 1], opacity: [0, 1] }} className="glass p-24 rounded-[60px] border-indigo-500/20 shadow-2xl shadow-indigo-600/10">
-            <h2 className="text-6xl font-black tracking-tighter mb-10 italic uppercase text-white">Ready to Transform?</h2>
-            <p className="text-gray-400 text-xl mb-14 font-medium">Join 2,000+ teams shipping better software.</p>
-            <div className="flex flex-col sm:flex-row justify-center gap-8">
-              <Link to="/register" className="bg-white text-black px-12 py-6 rounded-2xl font-black text-sm tracking-widest hover:scale-105 transition-all shadow-xl shadow-white/5">
-                START FREE TRIAL
-              </Link>
-              <div className="flex flex-col justify-center text-left gap-1">
-                 <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">No credit card required</div>
-                 <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest">14-Day Pro access included</div>
+            {/* Content */}
+            <div className="mock-content">
+              <div className="mock-toprow">
+                <div>
+                  <div className="mock-h">Sprint 4 — Q3 Launch 🚀</div>
+                  <div className="mock-meta">12 tasks · 4 members · Due Jul 15</div>
+                </div>
+                <div className="mock-tags">
+                  <span className="tag tag-green">On Track</span>
+                  <span className="tag tag-purple">AI Active</span>
+                </div>
+              </div>
+              <div className="mock-board">
+                {[
+                  {label:"To Do",color:"#818cf8",cards:[{t:"Design system tokens",u:"AS"},{t:"Setup CI/CD pipeline",u:"MR"},{t:"API rate limiting",u:"PK"}]},
+                  {label:"In Progress",color:"#a78bfa",cards:[{t:"Auth middleware",u:"AS"},{t:"Kanban drag & drop",u:"LW"}]},
+                  {label:"Done",color:"#34d399",cards:[{t:"DB schema v2",u:"MR"},{t:"Stripe webhooks",u:"AS"},{t:"Unit tests",u:"PK"}]},
+                ].map(col=>(
+                  <div key={col.label} className="board-col">
+                    <div className="col-header" style={{color:col.color}}>
+                      <span className="col-dot" style={{background:col.color}}/>
+                      {col.label} <span className="col-count">{col.cards.length}</span>
+                    </div>
+                    {col.cards.map(c=>(
+                      <div key={c.t} className="board-card">
+                        <div className="card-title">{c.t}</div>
+                        <div className="card-meta">
+                          <span className="card-priority">High</span>
+                          <div className="card-avatar">{c.u}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
             </div>
-          </motion.div>
-        </div>
-      </section>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
-      {/* Footer */}
-      <footer className="py-32 px-6 border-t border-white/5 bg-black relative z-10">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-5 gap-20">
-          <div className="col-span-2">
-            <div className="flex items-center gap-3 mb-8">
-               <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-lg">T</div>
-               <span className="text-2xl font-black tracking-tighter text-white">TaskFlow</span>
+/* ── Tech strip ── */
+function TechStrip() {
+  return (
+    <div className="tech-strip">
+      <p className="tech-label">Trusted stack powering 2,000+ teams</p>
+      <div className="tech-logos">
+        {["React 18","Node.js","MongoDB","Socket.io","Stripe","Redis","Docker"].map(t=>(
+          <span key={t} className="tech-logo">{t}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Features ── */
+const FEATURES = [
+  {icon:Activity,title:"Real-Time Collaboration",desc:"Sub-100ms updates powered by Socket.io. Every card move, comment, and status change syncs instantly across every device.",color:"indigo",big:true},
+  {icon:Bot,title:"Neural AI Assistant",desc:"Auto-generates tasks from meeting notes, predicts sprint velocity, and surfaces blockers before they slow you down.",color:"purple",big:false},
+  {icon:Shield,title:"Enterprise Security",desc:"AES-256 encryption at rest, TLS in transit, granular RBAC, audit logs, and SOC 2 Type II compliance.",color:"cyan",big:false},
+  {icon:BarChart3,title:"Deep Analytics",desc:"Live burndown charts, velocity tracking, cycle time, and custom KPI dashboards with exportable reports.",color:"purple",big:false},
+  {icon:Calendar,title:"Multi-View Boards",desc:"Switch seamlessly between Kanban, List, and Calendar views. Visualize work the way your team thinks — no extra setup needed.",color:"indigo",big:false},
+  {icon:Workflow,title:"Smart Automations",desc:"Build powerful no-code rules — auto-assign tasks, send Slack alerts, move cards, and more with zero manual effort.",color:"indigo",big:true},
+  {icon:CreditCard,title:"Stripe Billing Built-in",desc:"Tiered subscriptions, seat-based pricing, webhook sync, proration, and in-app upgrade flows out of the box.",color:"cyan",big:false},
+];
+
+const C = {
+  indigo:{bg:"rgba(99,102,241,.12)",text:"#818cf8",glow:"rgba(99,102,241,.25)",border:"rgba(99,102,241,.25)"},
+  purple:{bg:"rgba(168,85,247,.12)",text:"#c084fc",glow:"rgba(168,85,247,.25)",border:"rgba(168,85,247,.25)"},
+  cyan:  {bg:"rgba(34,211,238,.1)", text:"#22d3ee",glow:"rgba(34,211,238,.2)", border:"rgba(34,211,238,.2)"},
+};
+
+function Features() {
+  return (
+    <section id="features" className="section">
+      <div className="container">
+        <motion.div {...up()} className="section-head">
+          <div className="section-badge"><TrendingUp size={12}/>Features</div>
+          <h2 className="section-title">Everything your team needs,<br/><span className="grad-text">nothing you don't.</span></h2>
+          <p className="section-sub">One platform to replace Jira, Notion, Slack bots, and billing dashboards.</p>
+        </motion.div>
+        <div className="bento-grid">
+          {FEATURES.map(({icon:Icon,title,desc,color,big},i)=>{
+            const c=C[color];
+            return (
+              <motion.div key={title} {...up(i*0.07)} className={`bento-card ${big?"bento-big":""}`}
+                style={{"--accent":c.text,"--border":c.border,"--glow":c.glow}}
+                whileHover={{y:-6,transition:{duration:.2}}}
+              >
+                <div className="bento-icon" style={{background:c.bg,color:c.text}}><Icon size={22}/></div>
+                <h3 className="bento-title">{title}</h3>
+                <p className="bento-desc">{desc}</p>
+                <div className="bento-shine"/>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Stats ── */
+function Stats() {
+  return (
+    <section className="stats-section">
+      <div className="container">
+        <div className="stats-grid">
+          {[{v:"2K+",l:"Teams worldwide"},{v:"10M+",l:"Tasks shipped"},{v:"99.9%",l:"Uptime SLA"},{v:"<80ms",l:"Real-time latency"}].map(({v,l})=>(
+            <motion.div key={l} {...up()} className="stat-card">
+              <span className="stat-val">{v}</span>
+              <span className="stat-lbl">{l}</span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Workflow ── */
+const STEPS = [
+  {icon:Users,      title:"Create your workspace",  desc:"Spin up a team workspace in 30 seconds. Invite members, set roles (Owner, Admin, Member, Guest), and configure your settings."},
+  {icon:GitBranch,  title:"Build & organize projects",desc:"Use Kanban, List, or Calendar view. Create tasks, set priorities, assign owners, add due dates, and attach files effortlessly."},
+  {icon:Bot,        title:"Automate repetitive work", desc:"Define rules like \"When task moves to Done → notify Slack\". Let the AI assistant draft task descriptions and estimate effort."},
+  {icon:BarChart3,  title:"Measure & ship faster",    desc:"Track your team's velocity with live dashboards. Hit sprint goals, celebrate wins, and continuously improve your process."},
+];
+
+function WorkflowSection() {
+  return (
+    <section id="workflow" className="section workflow-section">
+      <div className="container">
+        <div className="workflow-layout">
+          <motion.div {...up()} className="workflow-left">
+            <div className="section-badge"><Cpu size={12}/>How It Works</div>
+            <h2 className="section-title" style={{textAlign:"left"}}>From zero to<br/><span className="grad-text">shipping in minutes.</span></h2>
+            <p className="section-sub" style={{textAlign:"left",margin:"0 0 2rem"}}>No onboarding calls. No consultants. Just open TaskFlow and go.</p>
+            <Link to="/register" className="btn-primary btn-lg">Start free today <ArrowRight size={16}/></Link>
+          </motion.div>
+          <div className="steps">
+            {STEPS.map(({icon:Icon,title,desc},i)=>(
+              <motion.div key={title} {...up(i*0.1)} className="step">
+                <div className="step-left">
+                  <div className="step-num">{i+1}</div>
+                  {i<STEPS.length-1 && <div className="step-line"/>}
+                </div>
+                <div className="step-body">
+                  <div className="step-icon-wrap"><Icon size={16}/></div>
+                  <h4 className="step-title">{title}</h4>
+                  <p className="step-desc">{desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Testimonials ── */
+const TESTI = [
+  {q:"TaskFlow cut our sprint planning time by 60%. The AI task suggestions are genuinely impressive.",name:"Priya Sharma",role:"Engineering Lead · Zeta Corp",init:"P"},
+  {q:"We migrated from Jira in a single weekend. The Kanban board is buttery smooth and our team actually enjoys using it.",name:"Marcus Webb",role:"CTO · Launchpad AI",init:"M"},
+  {q:"Finally a tool that feels like it was designed this decade. Fast, clean, and insanely powerful under the hood.",name:"Aiko Tanaka",role:"Product Manager · Flux Systems",init:"A"},
+];
+
+function Testimonials() {
+  return (
+    <section className="section">
+      <div className="container">
+        <motion.div {...up()} className="section-head">
+          <div className="section-badge"><Star size={12}/>Testimonials</div>
+          <h2 className="section-title">Loved by <span className="grad-text">high-performance teams.</span></h2>
+        </motion.div>
+        <div className="testi-grid">
+          {TESTI.map(({q,name,role,init},i)=>(
+            <motion.div key={name} {...up(i*0.1)} className="testi-card" whileHover={{y:-5,transition:{duration:.2}}}>
+              <div className="testi-stars">{Array(5).fill(0).map((_,si)=><Star key={si} size={14} fill="#f59e0b" color="#f59e0b"/>)}</div>
+              <p className="testi-q">"{q}"</p>
+              <div className="testi-author">
+                <div className="testi-avatar">{init}</div>
+                <div><div className="testi-name">{name}</div><div className="testi-role">{role}</div></div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Pricing ── */
+const PLANS = [
+  {name:"Free",   price:"0",  period:"",    desc:"Perfect for solo builders and side projects.",
+   feats:["3 projects","5 team members","Basic Kanban board","1 GB storage","Discord support"],cta:"Get started free",hi:false},
+  {name:"Pro",    price:"19", period:"/mo", desc:"For fast-moving teams that need the full toolkit.",
+   feats:["Unlimited projects","Unlimited members","AI assistant","Advanced analytics","10 GB storage","Custom automations","Priority support"],cta:"Start 14-day trial",hi:true},
+  {name:"Team",   price:"49", period:"/mo", desc:"For enterprises that demand control and compliance.",
+   feats:["Everything in Pro","SSO & SAML login","Audit logs","REST API access","100 GB storage","Dedicated SLA","Custom roles & RBAC"],cta:"Contact sales",hi:false},
+];
+
+function Pricing() {
+  return (
+    <section id="pricing" className="section">
+      <div className="container">
+        <motion.div {...up()} className="section-head">
+          <div className="section-badge"><CreditCard size={12}/>Pricing</div>
+          <h2 className="section-title">Simple, <span className="grad-text">transparent pricing.</span></h2>
+          <p className="section-sub">No hidden fees. No contracts. Upgrade, downgrade, or cancel anytime.</p>
+        </motion.div>
+        <div className="price-grid">
+          {PLANS.map(({name,price,period,desc,feats,cta,hi},i)=>(
+            <motion.div key={name} {...up(i*0.1)} className={`price-card ${hi?"price-card-hi":""}`}>
+              {hi && <div className="price-badge"><Sparkles size={11}/>Most Popular</div>}
+              <div className="price-name">{name}</div>
+              <div className="price-amount">
+                <span className="price-num">{price==="0"?"Free":`$${price}`}</span>
+                <span className="price-per">{period}</span>
+              </div>
+              <p className="price-desc">{desc}</p>
+              <ul className="price-feats">
+                {feats.map(f=><li key={f}><CheckCircle2 size={14}/>{f}</li>)}
+              </ul>
+              <Link to="/register" className={hi?"btn-primary btn-full":"btn-outline btn-full"}>{cta}</Link>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── CTA ── */
+function CTA() {
+  return (
+    <section className="cta-section">
+      <div className="container">
+        <motion.div {...up()} className="cta-card">
+          <div className="cta-orb cta-orb1"/><div className="cta-orb cta-orb2"/>
+          <div className="cta-inner">
+            <div className="section-badge" style={{margin:"0 auto 1.5rem"}}><Sparkles size={12}/>Limited Beta</div>
+            <h2 className="cta-title">Ready to transform<br/>how your team works?</h2>
+            <p className="cta-sub">Join 2,000+ engineering teams already shipping faster with TaskFlow.</p>
+            <Link to="/register" className="btn-white btn-lg">Start for free — no card needed</Link>
+            <p className="cta-note">✓ 14-day Pro trial &nbsp;·&nbsp; ✓ Cancel anytime &nbsp;·&nbsp; ✓ SOC 2 compliant</p>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Footer ── */
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="container">
+        <div className="footer-top">
+          <div>
+            <div className="logo" style={{marginBottom:"1rem"}}>
+              <div className="logo-icon"><Zap size={16}/></div>
+              <span className="logo-text">TaskFlow</span>
             </div>
-            <p className="text-gray-600 text-sm max-w-sm leading-relaxed font-medium">
-              The high-performance workspace designed for modern engineering teams and visionaries. 
-              Built for speed, styled for impact.
-            </p>
+            <p className="footer-tagline">The high-performance workspace for modern engineering teams. Built for speed, styled for impact.</p>
           </div>
-          <div>
-            <h5 className="text-[10px] uppercase tracking-[0.3em] font-black text-gray-400 mb-8">Platform</h5>
-            <ul className="space-y-4 text-xs font-bold text-gray-600">
-               <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-               <li><a href="#" className="hover:text-white transition-colors">Integrations</a></li>
-               <li><a href="#" className="hover:text-white transition-colors">AI Core</a></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="text-[10px] uppercase tracking-[0.3em] font-black text-gray-400 mb-8">Company</h5>
-            <ul className="space-y-4 text-xs font-bold text-gray-600">
-               <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-               <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-               <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="text-[10px] uppercase tracking-[0.3em] font-black text-gray-400 mb-8">Social</h5>
-            <ul className="space-y-4 text-xs font-bold text-gray-600">
-               <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li>
-               <li><a href="#" className="hover:text-white transition-colors">GitHub</a></li>
-               <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
-            </ul>
+          {[
+            {title:"Product",links:["Features","Pricing","Changelog","Roadmap","API Docs"]},
+            {title:"Company",links:["About","Blog","Careers","Press","Contact"]},
+            {title:"Legal",  links:["Privacy Policy","Terms of Service","Security","Cookie Policy"]},
+          ].map(({title,links})=>(
+            <div key={title}>
+              <h5 className="footer-col-title">{title}</h5>
+              <ul className="footer-col-links">
+                {links.map(l=><li key={l}><a href="#">{l}</a></li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="footer-bottom">
+          <span>© 2026 TaskFlow, Inc. All rights reserved.</span>
+          <div className="footer-socials">
+            {["GitHub","Twitter","LinkedIn","Discord"].map(s=><a key={s} href="#">{s}</a>)}
           </div>
         </div>
-        <div className="max-w-7xl mx-auto mt-32 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-           <div className="text-[10px] font-black text-gray-800 tracking-[0.5em] uppercase">TASKFLOW OS © 2026</div>
-           <div className="flex gap-10 text-[10px] font-black text-gray-800 tracking-[0.2em] uppercase">
-             <a href="#">Security</a>
-             <a href="#">Privacy</a>
-             <a href="#">Terms</a>
-           </div>
-        </div>
-      </footer>
+      </div>
+    </footer>
+  );
+}
+
+/* ── Page ── */
+export default function LandingPage() {
+  return (
+    <div className="lp">
+      <Navbar/>
+      <Hero/>
+      <TechStrip/>
+      <Features/>
+      <Stats/>
+      <WorkflowSection/>
+      <Testimonials/>
+      <Pricing/>
+      <CTA/>
+      <Footer/>
     </div>
   );
 }
