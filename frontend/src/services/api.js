@@ -2,7 +2,10 @@ import axios from 'axios'
 import store from '../store'
 import { setAccessToken, clearAuth } from '../store/authSlice'
 
-const base = import.meta.env.VITE_API_URL || 'http://localhost:4000/api'
+let base = import.meta.env.VITE_API_URL || 'http://localhost:4000/api'
+if (base && !base.endsWith('/api') && !base.endsWith('/api/')) {
+  base = base.replace(/\/$/, '') + '/api'
+}
 
 const api = axios.create({
   baseURL: base,
