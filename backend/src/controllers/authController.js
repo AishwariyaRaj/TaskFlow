@@ -89,39 +89,37 @@ async function login(req, res){
 }
 
 async function googleLogin(req, res) {
-  const { credential } = req.body;
-  if (!credential) return res.status(400).json({ message: 'Credential required' });
+  const { credential, access_token } = req.body;
+  if (!credential && !access_token) return res.status(400).json({ message: 'Google token required' });
 
   try {
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID
-    });
-    const { name, email, sub: googleId, picture } = ticket.getPayload();
+    let name, email, googleId, picture;
+
+    if (credential) {
+      // ID token flow (old GoogleLogin component)
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID
+      });
+      const payload = ticket.getPayload();
+      name = payload.name; email = payload.email; googleId = payload.sub; picture = payload.picture;
+    } else {
+      // Access token flow (useGoogleLogin hook)
+      const resp = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`);
+      if (!resp.ok) return res.status(400).json({ message: 'Invalid Google access token' });
+      const info = await resp.json();
+      name = info.name; email = info.email; googleId = info.sub; picture = info.picture;
+    }
 
     let user = await User.findOne({ email: email.toLowerCase() });
-
     if (!user) {
-      // Create user if not exists
-      user = await User.create({
-        name,
-        email: email.toLowerCase(),
-        isEmailVerified: true, // Google emails are already verified
-        googleId,
-        avatar: picture
-      });
+      user = await User.create({ name, email: email.toLowerCase(), isEmailVerified: true, googleId, avatar: picture });
     } else {
-      // Update googleId if not set
-      if (!user.googleId) {
-        user.googleId = googleId;
-        user.isEmailVerified = true;
-        await user.save();
-      }
+      if (!user.googleId) { user.googleId = googleId; user.isEmailVerified = true; await user.save(); }
     }
 
     const accessToken = jwtUtils.signAccess({ sub: user._id }, process.env.JWT_ACCESS_SECRET);
     const refreshToken = jwtUtils.signRefresh({ sub: user._id }, process.env.JWT_REFRESH_SECRET);
-    
     user.refreshTokens = user.refreshTokens || [];
     user.refreshTokens.push({ token: refreshToken, createdAt: new Date() });
     if (user.refreshTokens.length > 5) user.refreshTokens = user.refreshTokens.slice(-5);
@@ -130,13 +128,13 @@ async function googleLogin(req, res) {
     const cookieOpts = { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 30*24*60*60*1000 };
     if (process.env.NODE_ENV === 'production') cookieOpts.secure = true;
     res.cookie('refreshToken', refreshToken, cookieOpts);
-
     res.json({ accessToken, user: { _id: user._id, name: user.name, email: user.email } });
   } catch (err) {
     console.error('Google login error', err);
     res.status(400).json({ message: 'Google authentication failed' });
   }
 }
+
 
 async function refresh(req, res){
   const token = req.cookies.refreshToken || req.body.refreshToken;
