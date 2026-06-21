@@ -169,15 +169,17 @@ export default function Login() {
           </div>
         </div>
 
-        <div className="w-full">
-          <GoogleLogin 
-            onSuccess={onGoogleSuccess} 
-            onError={() => setError('Google login failed')}
-            theme="filled_black"
-            shape="rectangular"
-            size="large"
-            width="100%"
-          />
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: '100%', overflow: 'hidden', borderRadius: '10px' }}>
+            <GoogleLogin 
+              onSuccess={onGoogleSuccess} 
+              onError={() => setError('Google login failed')}
+              theme="filled_black"
+              shape="rectangular"
+              size="large"
+              width="500"
+            />
+          </div>
         </div>
 
         <div className="mt-6 text-center">

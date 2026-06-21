@@ -216,15 +216,17 @@ export default function Register() {
           </div>
         </div>
 
-        <div className="w-full">
-          <GoogleLogin 
-            onSuccess={onGoogleSuccess} 
-            onError={() => setError('Google signup failed')}
-            theme="filled_black"
-            shape="rectangular"
-            size="large"
-            width="100%"
-          />
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: '100%', overflow: 'hidden', borderRadius: '10px' }}>
+            <GoogleLogin 
+              onSuccess={onGoogleSuccess} 
+              onError={() => setError('Google signup failed')}
+              theme="filled_black"
+              shape="rectangular"
+              size="large"
+              width="500"
+            />
+          </div>
         </div>
 
         <p className="text-center text-xs text-[#8b8ba8] mt-4">
