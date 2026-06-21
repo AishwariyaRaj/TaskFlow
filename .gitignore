@@ -30,3 +30,6 @@ Thumbs.db
 # Subdirectory specific
 backend/.env
 frontend/.env
+
+# BFG Reports
+..bfg-report/
