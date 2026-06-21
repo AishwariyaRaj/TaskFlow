@@ -9,6 +9,7 @@ const connectDB = require('./config/db');
 const { Server } = require('socket.io');
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 
 if (process.env.STRIPE_SECRET && process.env.STRIPE_SECRET.startsWith('sk_live_')) {
