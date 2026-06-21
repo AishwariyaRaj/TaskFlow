@@ -76,6 +76,10 @@ async function sendVerificationEmail(user, token){
     await sendMail({ to: user.email, subject, text, html });
   } catch(err){
     console.error('Failed to send verification email', err);
+    console.log(`\n==================================================`);
+    console.log(`[EMAIL FALLBACK] Verification link for user ${user.email}:`);
+    console.log(verifyUrl);
+    console.log(`==================================================\n`);
   }
 }
 
