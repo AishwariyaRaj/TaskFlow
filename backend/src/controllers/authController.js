@@ -138,7 +138,7 @@ async function googleLogin(req, res) {
     res.json({ accessToken, user: { _id: user._id, name: user.name, email: user.email } });
   } catch (err) {
     console.error('Google login error', err);
-    res.status(400).json({ message: 'Google authentication failed' });
+    res.status(400).json({ message: 'Google authentication failed: ' + err.message });
   }
 }
 
