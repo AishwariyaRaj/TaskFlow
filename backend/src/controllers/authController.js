@@ -13,14 +13,10 @@ async function register(req, res){
   const existing = await User.findOne({ email: email.toLowerCase() });
   if (existing) return res.status(400).json({ message: 'Email already registered' });
   const passwordHash = await bcrypt.hash(password, 12);
-  const isEmailVerified = !process.env.SMTP_HOST;
-  const emailVerificationToken = isEmailVerified ? undefined : uuidv4();
-  const user = await User.create({ name, email: email.toLowerCase(), passwordHash, emailVerificationToken, isEmailVerified });
-  // Send email in background so registration responds immediately and doesn't hang
-  sendVerificationEmail(user, emailVerificationToken).catch(err => {
-    console.error('sendVerificationEmail error', err);
-  });
-  res.status(201).json({ message: 'User created. Please check your email to verify your account.' });
+  const isEmailVerified = true;
+  const emailVerificationToken = undefined;
+  await User.create({ name, email: email.toLowerCase(), passwordHash, emailVerificationToken, isEmailVerified });
+  res.status(201).json({ message: 'User created successfully. Please log in.' });
 }
 
 async function verifyEmail(req, res){
@@ -61,11 +57,6 @@ async function login(req, res){
     if (!ok) {
       console.log(`[AUTH] Password mismatch for: ${email}. Provided: ${password}, Hash in DB: ${user.passwordHash}`);
       return res.status(400).json({ message: 'Invalid credentials' });
-    }
-    
-    if (!user.isEmailVerified) {
-      console.log(`[AUTH] Email not verified: ${email}`);
-      return res.status(403).json({ message: 'Please verify your email before logging in' });
     }
 
     const accessToken = jwtUtils.signAccess({ sub: user._id }, process.env.JWT_ACCESS_SECRET);

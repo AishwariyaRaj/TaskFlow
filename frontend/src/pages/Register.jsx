@@ -31,7 +31,7 @@ export default function Register() {
     setLoading(true)
     try {
       await api.post('/auth/register', { name: form.name, email: form.email, password: form.password })
-      setSuccess(true)
+      navigate('/login', { state: { email: form.email, registered: true } })
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed')
     } finally {

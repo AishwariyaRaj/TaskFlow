@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setAuth } from '../store/authSlice'
 import { connectSocket } from '../services/socket'
@@ -9,7 +9,8 @@ import ToastContainer from '../components/ui/Toast'
 import { addToast } from '../store/uiSlice'
 
 export default function Login() {
-  const [form, setForm] = useState({ email: '', password: '' })
+  const location = useLocation()
+  const [form, setForm] = useState({ email: location.state?.email || '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -17,6 +18,14 @@ export default function Login() {
   const dispatch = useDispatch()
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/workspaces'
+
+  useEffect(() => {
+    if (location.state?.registered) {
+      dispatch(addToast({ message: 'Registration successful! Please log in.', type: 'success' }))
+      // Clear location state so toast doesn't reappear on reload
+      window.history.replaceState({}, document.title)
+    }
+  }, [location, dispatch])
 
   async function onSubmit(e) {
     e.preventDefault()
